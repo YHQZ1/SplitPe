@@ -1,7 +1,6 @@
 class UpiHelper {
   // Your GitHub Pages URL — change YOUR_GITHUB_USERNAME to your actual username
-  static const String _baseUrl =
-      'https://YOUR_GITHUB_USERNAME.github.io/splitpe';
+  static const String _baseUrl = 'https://split-pe.vercel.app';
 
   /// Generates a shareable web link that opens the payment page.
   /// This works in WhatsApp, iMessage, etc. — no raw upi:// scheme.
