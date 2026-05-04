@@ -1,6 +1,7 @@
 class UpiHelper {
   // Your GitHub Pages URL — change YOUR_GITHUB_USERNAME to your actual username
-  static const String _baseUrl = 'https://YOUR_GITHUB_USERNAME.github.io/splitpe';
+  static const String _baseUrl =
+      'https://YOUR_GITHUB_USERNAME.github.io/splitpe';
 
   /// Generates a shareable web link that opens the payment page.
   /// This works in WhatsApp, iMessage, etc. — no raw upi:// scheme.
@@ -42,7 +43,8 @@ class UpiHelper {
     return 'Hey \$participantName! Your share is ₹\${amount.toStringAsFixed(2)}.'
         '\n\nPay \$payeeName via UPI 👇'
         '\n\$shareableLink'
-        '\n\nTap the link → pick your UPI app → done 🎉';
+        '\n\nTap the link → your UPI app will open automatically'
+        '\nIf not, choose your app manually 👇';
   }
 
   static bool isValidUpiId(String upiId) {

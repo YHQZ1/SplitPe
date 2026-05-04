@@ -1,431 +1,219 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-  <title>Pay via SplitPe</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
+    />
+    <title>Pay via SplitPe</title>
 
-    :root {
-      --bg: #09090f;
-      --card: #111118;
-      --border: #1e1e2e;
-      --accent: #00d4a8;
-      --accent-dim: rgba(0,212,168,0.10);
-      --text: #f0f0f5;
-      --muted: #5a5a72;
-      --danger: #ef4444;
-    }
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@500&display=swap"
+      rel="stylesheet"
+    />
 
-    html, body {
-      min-height: 100%;
-      background: var(--bg);
-      font-family: 'DM Sans', sans-serif;
-      color: var(--text);
-      -webkit-font-smoothing: antialiased;
-    }
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
 
-    body {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100dvh;
-      padding: 24px 20px 40px;
-    }
+      :root {
+        --bg: #09090f;
+        --card: #111118;
+        --border: #1e1e2e;
+        --accent: #00d4a8;
+        --text: #f0f0f5;
+        --muted: #5a5a72;
+      }
 
-    /* Background glow */
-    body::before {
-      content: '';
-      position: fixed;
-      top: -120px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 480px;
-      height: 480px;
-      background: radial-gradient(circle, rgba(0,212,168,0.07) 0%, transparent 70%);
-      pointer-events: none;
-      z-index: 0;
-    }
+      body {
+        min-height: 100vh;
+        background: var(--bg);
+        font-family: "DM Sans", sans-serif;
+        color: var(--text);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 24px;
+      }
 
-    .wrap {
-      position: relative;
-      z-index: 1;
-      width: 100%;
-      max-width: 380px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      animation: fadeUp 0.5s cubic-bezier(0.16,1,0.3,1) both;
-    }
+      .wrap {
+        width: 100%;
+        max-width: 380px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
 
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(18px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
+      .amount-card {
+        background: linear-gradient(135deg, #00d4a8, #00b894);
+        border-radius: 20px;
+        padding: 24px;
+        color: #0a0a0f;
+      }
 
-    /* Logo */
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 4px;
-    }
-    .logo-mark {
-      width: 36px; height: 36px;
-      background: var(--accent);
-      border-radius: 10px;
-      display: grid;
-      place-items: center;
-      font-size: 18px;
-      font-weight: 800;
-      color: var(--bg);
-      flex-shrink: 0;
-    }
-    .logo-name {
-      font-size: 18px;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-      color: var(--text);
-    }
+      .amount-value {
+        font-size: 42px;
+        font-weight: 800;
+      }
 
-    /* Amount card */
-    .amount-card {
-      background: linear-gradient(135deg, #00d4a8 0%, #00b894 100%);
-      border-radius: 20px;
-      padding: 24px 24px 20px;
-      position: relative;
-      overflow: hidden;
-    }
-    .amount-card::after {
-      content: '₹';
-      position: absolute;
-      right: -10px; top: -20px;
-      font-size: 120px;
-      font-weight: 800;
-      color: rgba(0,0,0,0.06);
-      line-height: 1;
-      pointer-events: none;
-    }
-    .amount-label {
-      font-size: 12px;
-      font-weight: 600;
-      color: rgba(0,0,0,0.5);
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      margin-bottom: 4px;
-    }
-    .amount-value {
-      font-size: 44px;
-      font-weight: 800;
-      color: #0a0a0f;
-      letter-spacing: -2px;
-      line-height: 1;
-    }
-    .amount-value span { font-size: 28px; vertical-align: top; margin-top: 6px; display: inline-block; }
-    .payee-row {
-      margin-top: 14px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .payee-avatar {
-      width: 28px; height: 28px;
-      background: rgba(0,0,0,0.15);
-      border-radius: 8px;
-      display: grid;
-      place-items: center;
-      font-size: 13px;
-      font-weight: 800;
-      color: #0a0a0f;
-    }
-    .payee-info { display: flex; flex-direction: column; }
-    .payee-name { font-size: 14px; font-weight: 700; color: #0a0a0f; line-height: 1.2; }
-    .payee-upi  { font-size: 11px; color: rgba(0,0,0,0.5); font-family: 'DM Mono', monospace; }
+      .apps {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
 
-    /* Apps section */
-    .section-label {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      padding: 0 2px;
-    }
+      .app-btn {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 16px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        color: var(--text);
+        cursor: pointer;
+      }
 
-    .apps { display: flex; flex-direction: column; gap: 10px; }
+      .primary {
+        border: 1px solid var(--accent);
+      }
 
-    .app-btn {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 16px 18px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      cursor: pointer;
-      text-decoration: none;
-      color: var(--text);
-      transition: border-color 0.15s, background 0.15s, transform 0.1s;
-      -webkit-tap-highlight-color: transparent;
-      position: relative;
-      overflow: hidden;
-    }
-    .app-btn::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: var(--accent);
-      opacity: 0;
-      transition: opacity 0.15s;
-    }
-    .app-btn:active { transform: scale(0.98); }
-    .app-btn:active::before { opacity: 0.04; }
+      .error-card {
+        display: none;
+        padding: 16px;
+        border-radius: 12px;
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        text-align: center;
+      }
 
-    .app-icon {
-      width: 44px; height: 44px;
-      border-radius: 12px;
-      flex-shrink: 0;
-      display: grid;
-      place-items: center;
-      font-size: 24px;
-    }
-    .app-icon.gpay    { background: #1a1a2e; }
-    .app-icon.phonepe { background: #1a1028; }
-    .app-icon.paytm   { background: #00172d; }
-    .app-icon.bhim    { background: #001a10; }
+      .error-card.show {
+        display: block;
+      }
 
-    .app-text { flex: 1; min-width: 0; }
-    .app-name { font-size: 15px; font-weight: 700; letter-spacing: -0.2px; }
-    .app-sub  { font-size: 12px; color: var(--muted); margin-top: 1px; }
+      .loading {
+        text-align: center;
+        color: var(--muted);
+      }
+    </style>
+  </head>
 
-    .app-arrow {
-      color: var(--muted);
-      font-size: 13px;
-      flex-shrink: 0;
-    }
+  <body>
+    <div class="wrap">
+      <div id="loading" class="loading">Opening payment...</div>
 
-    /* Error state */
-    .error-card {
-      background: rgba(239,68,68,0.08);
-      border: 1px solid rgba(239,68,68,0.2);
-      border-radius: 16px;
-      padding: 20px;
-      display: none;
-      text-align: center;
-    }
-    .error-card.show { display: block; }
-    .error-card p { color: #fca5a5; font-size: 14px; line-height: 1.5; }
+      <div id="main" style="display: none">
+        <div class="amount-card">
+          <div>You owe</div>
+          <div class="amount-value">₹<span id="amount"></span></div>
+          <div id="name"></div>
+          <div id="upi"></div>
+        </div>
 
-    /* Footer */
-    .footer {
-      text-align: center;
-      font-size: 12px;
-      color: var(--muted);
-      margin-top: 8px;
-    }
-    .footer strong { color: var(--accent); font-weight: 600; }
+        <!-- ✅ PRIMARY BUTTON -->
+        <button id="primary-pay" class="app-btn primary">
+          Pay Now (Default UPI App)
+        </button>
 
-    /* Loading state */
-    .loading {
-      text-align: center;
-      padding: 60px 0;
-      color: var(--muted);
-      font-size: 14px;
-    }
-    .spinner {
-      width: 28px; height: 28px;
-      border: 2px solid var(--border);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      margin: 0 auto 16px;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
+        <div class="apps" id="apps-list"></div>
 
-    .hidden { display: none !important; }
-  </style>
-</head>
-<body>
-  <div class="wrap">
-    <div class="logo">
-      <div class="logo-mark">₹</div>
-      <span class="logo-name">SplitPe</span>
-    </div>
-
-    <div id="loading" class="loading">
-      <div class="spinner"></div>
-      Reading payment details…
-    </div>
-
-    <div id="main" class="hidden">
-      <div class="amount-card">
-        <div class="amount-label">You owe</div>
-        <div class="amount-value"><span>₹</span><span id="amount-display">—</span></div>
-        <div class="payee-row">
-          <div class="payee-avatar" id="payee-avatar">U</div>
-          <div class="payee-info">
-            <span class="payee-name" id="payee-name">—</span>
-            <span class="payee-upi"  id="payee-upi">—</span>
-          </div>
+        <div id="error-card" class="error-card">
+          Couldn't open UPI app. Choose manually.
         </div>
       </div>
-
-      <div class="section-label">Open in your UPI app</div>
-
-      <div class="apps" id="apps-list">
-        <!-- injected by JS -->
-      </div>
-
-      <div class="error-card" id="error-card">
-        <p>Couldn't open the UPI app.<br>Make sure it's installed and try again.</p>
-      </div>
-
-      <div class="footer">
-        Powered by <strong>SplitPe</strong> · No account needed
-      </div>
     </div>
 
-    <div id="bad-link" class="hidden">
-      <div class="error-card show">
-        <p>This payment link is invalid or has expired.<br>Ask the sender to resend it.</p>
-      </div>
-    </div>
-  </div>
+    <script>
+      function getParams() {
+        const raw =
+          window.location.hash.slice(1) || window.location.search.slice(1);
+        if (!raw) return null;
 
-  <script>
-    // Parse params from URL hash  →  #pa=rahul@okaxis&pn=Rahul&am=300.00
-    function getParams() {
-      const hash = window.location.hash.slice(1);   // strip #
-      const search = window.location.search.slice(1); // or ?pa=...
-      const raw = hash || search;
-      if (!raw) return null;
-      const p = {};
-      raw.split('&').forEach(part => {
-        const [k, v] = part.split('=');
-        if (k && v) p[decodeURIComponent(k)] = decodeURIComponent(v);
-      });
-      return (p.pa && p.am) ? p : null;
-    }
+        const p = {};
+        raw.split("&").forEach((x) => {
+          const [k, v] = x.split("=");
+          if (k && v) p[decodeURIComponent(k)] = decodeURIComponent(v);
+        });
 
-    function buildUpiQuery(params) {
-      return `pa=${encodeURIComponent(params.pa)}&pn=${encodeURIComponent(params.pn || '')}&am=${params.am}&cu=INR&tn=${encodeURIComponent(params.tn || 'Bill Split via SplitPe')}`;
-    }
+        return p.pa && p.am ? p : null;
+      }
 
-    const APPS = [
-      {
-        id: 'gpay',
-        name: 'Google Pay',
-        sub: 'Pay with GPay',
-        emoji: '🟢',
-        cls: 'gpay',
-        // GPay uses intent on Android, direct scheme on iOS
-        scheme: (q) => `gpay://upi/pay?${q}`,
-        intent: (q) => `intent://upi/pay?${q}#Intent;scheme=gpay;package=com.google.android.apps.nbu.paisa.user;end`,
-      },
-      {
-        id: 'phonepe',
-        name: 'PhonePe',
-        sub: 'Pay with PhonePe',
-        emoji: '🟣',
-        cls: 'phonepe',
-        scheme: (q) => `phonepe://pay?${q}`,
-        intent: (q) => `intent://pay?${q}#Intent;scheme=phonepe;package=com.phonepe.app;end`,
-      },
-      {
-        id: 'paytm',
-        name: 'Paytm',
-        sub: 'Pay with Paytm',
-        emoji: '🔵',
-        cls: 'paytm',
-        scheme: (q) => `paytmmp://pay?${q}`,
-        intent: (q) => `intent://pay?${q}#Intent;scheme=paytmmp;package=net.one97.paytm;end`,
-      },
-      {
-        id: 'bhim',
-        name: 'BHIM',
-        sub: 'Pay with BHIM UPI',
-        emoji: '🟠',
-        cls: 'bhim',
-        scheme: (q) => `upi://pay?${q}`,
-        intent: (q) => `intent://pay?${q}#Intent;scheme=upi;package=in.org.npci.upiapp;end`,
-      },
-    ];
+      function buildQuery(p) {
+        return `pa=${encodeURIComponent(p.pa)}&pn=${encodeURIComponent(p.pn || "")}&am=${p.am}&cu=INR&tn=${encodeURIComponent(p.tn || "SplitPe")}`;
+      }
 
-    function isAndroid() {
-      return /android/i.test(navigator.userAgent);
-    }
+      function isAndroid() {
+        return /android/i.test(navigator.userAgent);
+      }
 
-    function isIOS() {
-      return /iphone|ipad|ipod/i.test(navigator.userAgent);
-    }
+      function openUpi(url) {
+        let opened = false;
 
-    function openApp(app, query) {
-      const errorCard = document.getElementById('error-card');
-      errorCard.classList.remove('show');
+        document.addEventListener("visibilitychange", () => {
+          if (document.hidden) opened = true;
+        });
 
-      if (isAndroid()) {
-        // Use Android intent: URL — launches app directly, no browser needed
-        window.location.href = app.intent(query);
-      } else {
-        // iOS: use scheme directly
-        const url = app.scheme(query);
-        const start = Date.now();
         window.location.href = url;
-        // If app didn't open after 1.5s, show error
+
         setTimeout(() => {
-          if (Date.now() - start < 1600) {
-            errorCard.classList.add('show');
+          if (!opened) {
+            document.getElementById("error-card").classList.add("show");
           }
         }, 1500);
       }
-    }
 
-    function render(params) {
-      const query = buildUpiQuery(params);
-      const amount = parseFloat(params.am).toFixed(2);
-      const name = params.pn || 'Unknown';
+      function render(p) {
+        const query = buildQuery(p);
 
-      document.getElementById('amount-display').textContent = amount;
-      document.getElementById('payee-name').textContent = name;
-      document.getElementById('payee-upi').textContent = params.pa;
-      document.getElementById('payee-avatar').textContent = name[0].toUpperCase();
+        document.getElementById("amount").textContent = parseFloat(
+          p.am,
+        ).toFixed(2);
+        document.getElementById("name").textContent = p.pn || "";
+        document.getElementById("upi").textContent = p.pa;
 
-      const list = document.getElementById('apps-list');
-      APPS.forEach(app => {
-        const btn = document.createElement('button');
-        btn.className = 'app-btn';
-        btn.innerHTML = `
-          <div class="app-icon ${app.cls}">${app.emoji}</div>
-          <div class="app-text">
-            <div class="app-name">${app.name}</div>
-            <div class="app-sub">${app.sub}</div>
-          </div>
-          <span class="app-arrow">›</span>
-        `;
-        btn.addEventListener('click', () => openApp(app, query));
-        list.appendChild(btn);
-      });
+        // ✅ primary button
+        document.getElementById("primary-pay").onclick = () => {
+          openUpi(`upi://pay?${query}`);
+        };
 
-      document.getElementById('loading').classList.add('hidden');
-      document.getElementById('main').classList.remove('hidden');
-    }
+        // app buttons
+        const apps = [
+          { name: "Google Pay", url: `gpay://upi/pay?${query}` },
+          { name: "PhonePe", url: `phonepe://pay?${query}` },
+          { name: "Paytm", url: `paytmmp://pay?${query}` },
+          { name: "BHIM", url: `upi://pay?${query}` },
+        ];
 
-    // Init
-    window.addEventListener('DOMContentLoaded', () => {
-      setTimeout(() => {
-        const params = getParams();
-        if (params) {
-          render(params);
-        } else {
-          document.getElementById('loading').classList.add('hidden');
-          document.getElementById('bad-link').classList.remove('hidden');
+        const list = document.getElementById("apps-list");
+
+        apps.forEach((a) => {
+          const btn = document.createElement("button");
+          btn.className = "app-btn";
+          btn.innerText = a.name;
+          btn.onclick = () => openUpi(a.url);
+          list.appendChild(btn);
+        });
+
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("main").style.display = "block";
+
+        // 🚀 AUTO OPEN (Android only)
+        if (isAndroid()) {
+          setTimeout(() => {
+            openUpi(`upi://pay?${query}`);
+          }, 400);
         }
-      }, 300);
-    });
-  </script>
-</body>
+      }
+
+      window.onload = () => {
+        const p = getParams();
+        if (p) render(p);
+      };
+    </script>
+  </body>
 </html>
